@@ -210,7 +210,7 @@ const transpileTypedConfig = (diagnostics: Diagnostic[], sourceText: string, fil
     fileName: filePath,
     compilerOptions: {
       module: ts.ModuleKind.CommonJS,
-      moduleResolution: ts.ModuleResolutionKind.NodeJs,
+      moduleResolution: ts.ModuleResolutionKind.NodeNext,
       esModuleInterop: true,
       target: ts.ScriptTarget.ES2015,
       allowJs: true,
