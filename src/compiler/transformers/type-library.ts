@@ -21,9 +21,7 @@ const TYPE_LIBRARY: d.JsonDocsTypeLibrary = {};
  * @returns the unique ID for the type in question
  */
 export function addToLibrary(type: ts.Type, typeName: string, checker: ts.TypeChecker): string {
-  console.log('adding ', typeName);
   const pathToTypeModule = getPathToTypeModule(type);
-  console.log('path::', pathToTypeModule);
 
   // for now we don't make any attempt to include types in node_modules
   if (pathToTypeModule.startsWith('node_modules')) {
