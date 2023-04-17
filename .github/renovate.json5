@@ -85,4 +85,11 @@
   ],
   // Never rebase the branch or update it unless manually requested to avoid noisy PR emails
   rebaseWhen: 'never',
+  /**
+   * Ensure semantic commits are enabled for commits + PR titles.
+   *
+   * By default, Angular-style semantic commits will have a type of 'chore' and a scope of 'deps':
+   * `chore(deps): _your git commit title here_`
+   */
+  semanticCommits: "enabled",
 }
