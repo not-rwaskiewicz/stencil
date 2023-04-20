@@ -1,7 +1,9 @@
+  console.log('\n\nHEHRHEHEHE111\n\n');
 import { createTestingSystem } from '../../../testing/testing-sys';
 import { normalizePath } from '../../../utils';
 import { createInMemoryFs, getCommitInstructions, InMemoryFileSystem, shouldIgnore } from '../in-memory-fs';
 import { FsItem, FsItems } from '../in-memory-fs';
+  console.log('\n\nHEHRHEHEHE222\n\n');
 
 describe(`in-memory-fs, getCommitInstructions`, () => {
   let items: FsItems;
@@ -44,6 +46,8 @@ describe(`in-memory-fs, getCommitInstructions`, () => {
     expect(items.get(`C:/dir1/dir2`).queueDeleteFromDisk).toBe(false);
     expect(items.get(`C:/dir1/dir2/dir3`).queueDeleteFromDisk).toBe(false);
   });
+
+  console.log('\n\nHEHRHEHEHE\n\n');
 
   it(`dirsToDelete, sort longest to shortest, unix`, () => {
     const root = normalizePath(`/`);

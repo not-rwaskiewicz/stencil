@@ -33,7 +33,7 @@ export const nodeRequire = (id: string) => {
             fileName,
             compilerOptions: {
               module: ts.ModuleKind.CommonJS,
-              moduleResolution: ts.ModuleResolutionKind.NodeNext,
+              moduleResolution: ts.ModuleResolutionKind.Bundler,
               esModuleInterop: true,
               target: ts.ScriptTarget.ES2017,
               allowJs: true,

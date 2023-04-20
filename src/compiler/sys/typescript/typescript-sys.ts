@@ -1,12 +1,22 @@
-import { isRemoteUrl, isString, noop, normalizePath } from '@utils';
-import { basename, resolve } from 'path';
+import {
+  isRemoteUrl,
+  isString,
+  // noop,
+  normalizePath
+} from '@utils';
+import {
+  basename,
+  // resolve
+} from 'path';
 import ts from 'typescript';
 
 import type * as d from '../../../declarations';
-import { getCurrentDirectory, IS_CASE_SENSITIVE_FILE_NAMES, IS_WEB_WORKER_ENV } from '../environment';
+import {
+  // getCurrentDirectory,
+  IS_CASE_SENSITIVE_FILE_NAMES, IS_WEB_WORKER_ENV } from '../environment';
 import { fetchUrlSync } from '../fetch/fetch-module-sync';
 import { InMemoryFileSystem } from '../in-memory-fs';
-import { patchTypeScriptResolveModule } from './typescript-resolve-module';
+// import { patchTypeScriptResolveModule } from './typescript-resolve-module';
 
 // TODO(STENCIL-728): fix typing of `inMemoryFs` parameter in `patchTypescript`, related functions
 export const patchTsSystemFileSystem = (
@@ -156,6 +166,7 @@ export const patchTsSystemFileSystem = (
   return tsSys;
 };
 
+// @ts-ignore
 const patchTsSystemWatch = (compilerSystem: d.CompilerSystem, tsSys: ts.System) => {
   tsSys.watchDirectory = (p, cb, recursive) => {
     const watcher = compilerSystem.watchDirectory(
@@ -191,44 +202,44 @@ const patchTsSystemWatch = (compilerSystem: d.CompilerSystem, tsSys: ts.System) 
 };
 
 // TODO(STENCIL-728): fix typing of `inMemoryFs` parameter in `patchTypescript`, related functions
-export const patchTypescript = (config: d.Config, inMemoryFs: InMemoryFileSystem) => {
-  if (!(ts as any).__patched) {
-    if (config.sys) {
-      patchTsSystemFileSystem(config, config.sys, inMemoryFs, ts.sys);
-      patchTsSystemWatch(config.sys, ts.sys);
-    }
-    patchTypeScriptResolveModule(config, inMemoryFs);
-    patchTypeScriptGetParsedCommandLineOfConfigFile();
-    (ts as any).__patched = true;
-  }
+export const patchTypescript = (_config: d.Config, _inMemoryFs: InMemoryFileSystem) => {
+  // if (!(ts as any).__patched) {
+  //   if (config.sys) {
+  //     patchTsSystemFileSystem(config, config.sys, inMemoryFs, ts.sys);
+  //     patchTsSystemWatch(config.sys, ts.sys);
+  //   }
+  //   patchTypeScriptResolveModule(config, inMemoryFs);
+  //   patchTypeScriptGetParsedCommandLineOfConfigFile();
+  //   (ts as any).__patched = true;
+  // }
 };
 
-const patchTypeScriptSysMinimum = () => {
-  if (!ts.sys) {
-    // patches just the bare minimum
-    // if ts.sys already exists then it must be node ts.sys
-    // otherwise we're browser
-    // will be updated later on with the stencil sys
-    ts.sys = {
-      args: [],
-      createDirectory: noop,
-      directoryExists: () => false,
-      exit: noop,
-      fileExists: () => false,
-      getCurrentDirectory,
-      getDirectories: () => [],
-      getExecutingFilePath: () => './',
-      readDirectory: () => [],
-      readFile: noop,
-      newLine: '\n',
-      resolvePath: resolve,
-      useCaseSensitiveFileNames: false,
-      write: noop,
-      writeFile: noop,
-    };
-  }
-};
-patchTypeScriptSysMinimum();
+// const patchTypeScriptSysMinimum = () => {
+//   if (!ts.sys) {
+//     // patches just the bare minimum
+//     // if ts.sys already exists then it must be node ts.sys
+//     // otherwise we're browser
+//     // will be updated later on with the stencil sys
+//     ts.sys = {
+//       args: [],
+//       createDirectory: noop,
+//       directoryExists: () => false,
+//       exit: noop,
+//       fileExists: () => false,
+//       getCurrentDirectory,
+//       getDirectories: () => [],
+//       getExecutingFilePath: () => './',
+//       readDirectory: () => [],
+//       readFile: noop,
+//       newLine: '\n',
+//       resolvePath: resolve,
+//       useCaseSensitiveFileNames: false,
+//       write: noop,
+//       writeFile: noop,
+//     };
+//   }
+// };
+// patchTypeScriptSysMinimum();
 
 export const getTypescriptPathFromUrl = (config: d.Config, tsExecutingUrl: string, url: string) => {
   const tsBaseUrl = new URL('..', tsExecutingUrl).href;
@@ -245,24 +256,29 @@ export const getTypescriptPathFromUrl = (config: d.Config, tsExecutingUrl: strin
 };
 
 export const patchTypeScriptGetParsedCommandLineOfConfigFile = () => {
-  const orgGetParsedCommandLineOfConfigFile = ts.getParsedCommandLineOfConfigFile;
+  // const orgGetParsedCommandLineOfConfigFile = ts.getParsedCommandLineOfConfigFile;
 
-  ts.getParsedCommandLineOfConfigFile = (configFileName, optionsToExtend, host, extendedConfigCache) => {
-    const results = orgGetParsedCommandLineOfConfigFile(configFileName, optionsToExtend, host, extendedConfigCache);
+  // Object.defineProperty(
+  //   ts,
+  //   'getParsedCommandLineOfConfigFile',
+  //   // @ts-ignore
+  //   { value: (configFileName, optionsToExtend, host, extendedConfigCache) => {
+  //   const results = orgGetParsedCommandLineOfConfigFile(configFileName, optionsToExtend, host, extendedConfigCache);
 
-    // manually filter out any .spec or .e2e files
-    results.fileNames = results.fileNames.filter((f) => {
-      // filter e2e tests
-      if (f.includes('.e2e.') || f.includes('/e2e.')) {
-        return false;
-      }
-      // filter spec tests
-      if (f.includes('.spec.') || f.includes('/spec.')) {
-        return false;
-      }
-      return true;
-    });
+  //   // manually filter out any .spec or .e2e files
+  //   results.fileNames = results.fileNames.filter((f) => {
+  //     // filter e2e tests
+  //     if (f.includes('.e2e.') || f.includes('/e2e.')) {
+  //       return false;
+  //     }
+  //     // filter spec tests
+  //     if (f.includes('.spec.') || f.includes('/spec.')) {
+  //       return false;
+  //     }
+  //     return true;
+  //   });
 
-    return results;
-  };
+  //   return results;
+  //   }}
+  // );
 };
