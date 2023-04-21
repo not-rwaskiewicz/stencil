@@ -52,67 +52,43 @@ async function bundleTypeScriptSource(tsPath: string, opts: BuildOptions): Promi
   }.js`;
   const cacheFile = join(opts.scriptsBuildDir, fileName);
 
-  try {
-    // check if we've already cached this bundle
-    return await fs.readFile(cacheFile, 'utf8');
-  } catch (e) {}
+  // TMP never hit cache
+  // try {
+  //   // check if we've already cached this bundle
+  //   return await fs.readFile(cacheFile, 'utf8');
+  // } catch (e) {}
 
   // get the source typescript.js file to modify
   let code = await fs.readFile(tsPath, 'utf8');
 
   // remove the default ts.getDefaultLibFilePath because it uses some
   // node apis and we'll be replacing it with our own anyways
-  code = removeFromSource(code, `ts.getDefaultLibFilePath = getDefaultLibFilePath;`);
+  code = removeFromSource(code, `getDefaultLibFilePath: () => getDefaultLibFilePath,`);
 
   // remove the CPUProfiler since it uses node apis
-  code = removeFromSource(code, `enableCPUProfiler: enableCPUProfiler,`);
-  code = removeFromSource(code, `disableCPUProfiler: disableCPUProfiler,`);
+  code = removeFromSource(code, `enableCPUProfiler,`);
+  code = removeFromSource(code, `disableCPUProfiler,`);
+
+  // this is the bit where we transmute a commonjs module into an ES module
+  // don't ask why, just go with it 🙃
 
   // trim off the last part that sets module.exports and polyfills globalThis since
   // we don't want typescript to add itself to module.exports when in a node env
-  const tsEnding = `})(ts || (ts = {}));`;
+  const tsEnding = `if (typeof module !== "undefined" && module.exports) { module.exports = ts; }`;
+
   if (!code.includes(tsEnding)) {
     throw new Error(`"${tsEnding}" not found`);
   }
   const lastEnding = code.lastIndexOf(tsEnding);
-  code = code.slice(0, lastEnding + tsEnding.length);
+  code = code.slice(0, lastEnding);
 
-  // there's a billion unnecessary "var ts;" for namespaces
-  // but we'll be using the top level "const ts" instead
-  code = code.replace(/var ts;/g, '');
-
-  // minification is crazy better if it doesn't use typescript's
-  // namespace closures, like (function(ts) {...})(ts = ts || {});
-  code = code.replace(/ \|\| \(ts \= \{\}\)/g, '');
-
-  // make a nice clean default export
-  // "process.browser" is used by typescript to know if it should use the node sys or not
   const o: string[] = [];
   o.push(`// TypeScript ${opts.typescriptVersion}`);
   o.push(`import { IS_NODE_ENV } from '@environment';`);
   o.push(`process.browser = !IS_NODE_ENV;`);
-  o.push(`const ts = {};`);
   o.push(code);
   o.push(`export default ts;`);
   code = o.join('\n');
-
-  const { minify } = await import('terser');
-
-  if (opts.isProd) {
-    const minified = await minify(code, {
-      ecma: 2018,
-      module: true,
-      compress: {
-        ecma: 2018,
-        passes: 2,
-      },
-      format: {
-        ecma: 2018,
-        comments: false,
-      },
-    });
-    code = minified.code;
-  }
 
   await fs.writeFile(cacheFile, code);
 

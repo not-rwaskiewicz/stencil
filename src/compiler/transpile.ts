@@ -10,7 +10,7 @@ import { catchError, getInlineSourceMappingUrlLinker, isString } from '@utils';
 
 import { getTranspileConfig, getTranspileCssConfig, getTranspileResults } from './config/transpile-options';
 import { transformCssToEsm, transformCssToEsmSync } from './style/css-to-esm';
-import { patchTypescript } from './sys/typescript/typescript-sys';
+// import { patchTypescript } from './sys/typescript/typescript-sys';
 import { getPublicCompilerMeta } from './transformers/add-component-meta-static';
 import { transpileModule } from './transpile/transpile-module';
 
@@ -40,7 +40,7 @@ export const transpile = async (code: string, opts: TranspileOptions = {}): Prom
   try {
     if (shouldTranspileModule(results.inputFileExtension)) {
       const { config, compileOpts, transformOpts } = getTranspileConfig(opts);
-      patchTypescript(config, null);
+      // patchTypescript(config, null);
       transpileCode(config, compileOpts, transformOpts, results);
     } else if (results.inputFileExtension === 'd.ts') {
       results.code = '';
@@ -72,7 +72,7 @@ export const transpileSync = (code: string, opts: TranspileOptions = {}): Transp
   try {
     if (shouldTranspileModule(results.inputFileExtension)) {
       const { config, compileOpts, transformOpts } = getTranspileConfig(opts);
-      patchTypescript(config, null);
+      // patchTypescript(config, null);
       transpileCode(config, compileOpts, transformOpts, results);
     } else if (results.inputFileExtension === 'd.ts') {
       results.code = '';

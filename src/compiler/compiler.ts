@@ -10,7 +10,7 @@ import { getConfig } from './sys/config';
 import { patchFs } from './sys/fs-patch';
 import { createInMemoryFs } from './sys/in-memory-fs';
 import { resolveModuleIdAsync } from './sys/resolve/resolve-module-async';
-import { patchTypescript } from './sys/typescript/typescript-sys';
+// import { patchTypescript } from './sys/typescript/typescript-sys';
 import { createSysWorker } from './sys/worker/sys-worker';
 
 /**
@@ -45,7 +45,7 @@ export const createCompiler = async (userConfig: Config): Promise<Compiler> => {
     // Pipe events from sys.events to compilerCtx
     sys.events.on(compilerCtx.events.emit);
   }
-  patchTypescript(config, compilerCtx.fs);
+  // patchTypescript(config, compilerCtx.fs);
 
   const build = () => createFullBuild(config, compilerCtx);
 
