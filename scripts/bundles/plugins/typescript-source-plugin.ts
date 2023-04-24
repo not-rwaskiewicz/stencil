@@ -70,8 +70,8 @@ async function bundleTypeScriptSource(tsPath: string, opts: BuildOptions): Promi
   code = removeFromSource(code, `disableCPUProfiler,`);
 
   // this is a ~~sketchy~~ thing to do!
-  const TS_PROP_DEFINER = `__defProp(target, name, { get: all[name], enumerable: true });`
-  const TS_PROP_DEFINER_DRASTICALLY_IMPROVED = `__defProp(target, name, { get: all[name], enumerable: true, configurable: true });`
+  const TS_PROP_DEFINER = `__defProp(target, name, { get: all[name], enumerable: true });`;
+  const TS_PROP_DEFINER_DRASTICALLY_IMPROVED = `__defProp(target, name, { get: all[name], enumerable: true, configurable: true });`;
 
   code = code.replace(TS_PROP_DEFINER, TS_PROP_DEFINER_DRASTICALLY_IMPROVED);
 

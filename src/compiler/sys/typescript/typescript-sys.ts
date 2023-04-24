@@ -247,11 +247,19 @@ export const getTypescriptPathFromUrl = (config: d.Config, tsExecutingUrl: strin
 export const patchTypeScriptGetParsedCommandLineOfConfigFile = () => {
   const orgGetParsedCommandLineOfConfigFile = ts.getParsedCommandLineOfConfigFile;
 
-  ts.getParsedCommandLineOfConfigFile = (configFileName, optionsToExtend, host, extendedConfigCache) => {
+  const patchedFunc = (
+    configFileName: string,
+    optionsToExtend: ts.CompilerOptions,
+    host: ts.ParseConfigFileHost,
+    extendedConfigCache: Map<string, ts.ExtendedConfigCacheEntry>
+  ) => {
     const results = orgGetParsedCommandLineOfConfigFile(configFileName, optionsToExtend, host, extendedConfigCache);
+
+    console.log('GOT CALLED');
 
     // manually filter out any .spec or .e2e files
     results.fileNames = results.fileNames.filter((f) => {
+      console.log('checking ', f);
       // filter e2e tests
       if (f.includes('.e2e.') || f.includes('/e2e.')) {
         return false;
@@ -265,4 +273,10 @@ export const patchTypeScriptGetParsedCommandLineOfConfigFile = () => {
 
     return results;
   };
+
+  Object.defineProperty(ts, 'getParsedCommandLineOfConfigFile', {
+    get: () => patchedFunc,
+    enumerable: true,
+    configurable: true,
+  });
 };
