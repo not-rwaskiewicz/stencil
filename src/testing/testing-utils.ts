@@ -1,6 +1,8 @@
 import type * as d from '@stencil/core/internal';
 import { isOutputTargetDistLazy, isOutputTargetWww } from '@utils';
 import { join, relative } from 'path';
+import { format } from "prettier";
+import ionicConfig from "@ionic/prettier-config";
 
 import { InMemoryFileSystem } from '../compiler/sys/in-memory-fs';
 
@@ -190,4 +192,16 @@ export async function withSilentWarn<T>(cb: SilentWarnFunc<T>): Promise<T> {
   const retVal = await cb(warnMock);
   console.warn = realWarn;
   return retVal;
+}
+
+/**
+ * Helper function for quickly formatting a code snippet with Prettier, using
+ * the shared Ionic config. This is helpful for normalizing a snippet in a test
+ * with the output of the transpiler, for instance.
+ *
+ * @param code the code to format
+ * @returns formatted code!
+ */
+export function formatCode(code: string): string {
+  return format(code, { ...ionicConfig, parser: "typescript" })
 }

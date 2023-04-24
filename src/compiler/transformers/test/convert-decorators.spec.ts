@@ -2,6 +2,7 @@ import * as ts from 'typescript';
 
 import { filterDecorators } from '../decorators-to-static/convert-decorators';
 import { transpileModule } from './transpile';
+import { formatCode } from '@stencil/core/testing';
 
 /**
  * c for compact, c for class declaration, make of it what you will!
@@ -14,7 +15,7 @@ import { transpileModule } from './transpile';
  * @returns a formatted string!
  */
 function c(strings: TemplateStringsArray) {
-  return strings.join('').replace('\n', ' ').replace(/\s+/g, ' ');
+  return formatCode(strings.join('').replace('\n', ' ').replace(/\s+/g, ' '));
 }
 
 describe('convert-decorators', () => {
@@ -29,7 +30,7 @@ describe('convert-decorators', () => {
     // we test the whole output here to ensure that the field has been
     // removed from the class body correctly and replaced with an initializer
     // in the constructor
-    expect(t.outputText).toBe(
+    expect(formatCode(t.outputText)).toBe(
       c`export class CmpA {
         constructor() {
           this.val = "initial value";
