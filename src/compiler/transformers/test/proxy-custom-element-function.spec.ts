@@ -1,6 +1,8 @@
+import ionicConfig from '@ionic/prettier-config';
 import * as d from '@stencil/core/declarations';
-import { formatCode, mockCompilerCtx } from '@stencil/core/testing';
-import ts from 'typescript';
+import { mockCompilerCtx } from '@stencil/core/testing';
+import { format } from 'prettier';
+import * as ts from 'typescript';
 
 import * as AddComponentMetaProxy from '../add-component-meta-proxy';
 import { proxyCustomElement } from '../component-native/proxy-custom-element-function';
@@ -8,6 +10,7 @@ import { PROXY_CUSTOM_ELEMENT } from '../core-runtime-apis';
 import * as TransformUtils from '../transform-utils';
 import { transpileModule } from './transpile';
 
+const formatCode = (code: string) => format(code, { ...ionicConfig, parser: 'typescript' });
 
 describe('proxy-custom-element-function', () => {
   const componentClassName = 'MyComponent';
@@ -83,7 +86,7 @@ describe('proxy-custom-element-function', () => {
 
       expect(formatCode(transpiledModule.outputText)).toContain(
         formatCode(
-        `export const ${componentClassName} = /*@__PURE__*/ __stencil_proxyCustomElement(class ${componentClassName} extends HTMLElement {}, true);`
+          `export const ${componentClassName} = /*@__PURE__*/ __stencil_proxyCustomElement(class ${componentClassName} extends HTMLElement {}, true);`
         )
       );
     });
@@ -97,7 +100,7 @@ describe('proxy-custom-element-function', () => {
 
         expect(formatCode(transpiledModule.outputText)).toContain(
           formatCode(
-          `export const foo = 'hello world!', ${componentClassName} = /*@__PURE__*/ __stencil_proxyCustomElement(class ${componentClassName} extends HTMLElement {}, true);`
+            `export const foo = 'hello world!', ${componentClassName} = /*@__PURE__*/ __stencil_proxyCustomElement(class ${componentClassName} extends HTMLElement {}, true);`
           )
         );
       });
@@ -110,7 +113,7 @@ describe('proxy-custom-element-function', () => {
 
         expect(formatCode(transpiledModule.outputText)).toContain(
           formatCode(
-          `export const ${componentClassName} = /*@__PURE__*/ __stencil_proxyCustomElement(class ${componentClassName} extends HTMLElement {}, true), foo = 'hello world!';`
+            `export const ${componentClassName} = /*@__PURE__*/ __stencil_proxyCustomElement(class ${componentClassName} extends HTMLElement {}, true), foo = 'hello world!';`
           )
         );
       });
@@ -122,7 +125,9 @@ describe('proxy-custom-element-function', () => {
         const transpiledModule = transpileModule(code, null, compilerCtx, [], [transformer]);
 
         expect(formatCode(transpiledModule.outputText)).toContain(
-          formatCode(`export const foo = 'hello world!', ${componentClassName} = /*@__PURE__*/ __stencil_proxyCustomElement(class ${componentClassName} extends HTMLElement {}, true), bar = 'goodbye?';`)
+          formatCode(
+            `export const foo = 'hello world!', ${componentClassName} = /*@__PURE__*/ __stencil_proxyCustomElement(class ${componentClassName} extends HTMLElement {}, true), bar = 'goodbye?';`
+          )
         );
       });
     });

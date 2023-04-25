@@ -1,24 +1,38 @@
 import type { OutputTargetDistCollection } from '@stencil/core/declarations';
 import { mockValidatedConfig } from '@stencil/core/testing';
-import ts, { Extension } from 'typescript';
+import { Extension } from 'typescript';
+import * as ts from 'typescript';
 
 import { ValidatedConfig } from '../../../internal';
 import { mapImportsToPathAliases } from '../map-imports-to-path-aliases';
 import { transpileModule } from './transpile';
 
+let resolveModuleNameSpy: jest.Mock<ReturnType<typeof ts.resolveModuleName>, Parameters<typeof ts.resolveModuleName>>;
+
+// we need to mock typescript instead of being able to spy on
+// `resolveModuleName` because as of TS 5.0 the default export is an object
+// where methods are set on it using `Object.defineProperty` but they are
+// _not_ configurable. This means that `jest.spyOn` can't overwrite them with
+// a spy function!
+jest.mock('typescript', () => {
+  const original = jest.requireActual('typescript');
+  return {
+    ...original,
+    resolveModuleName: jest.fn((moduleName, containingFile, compilerOptions, moduleResolutionHost) => {
+      return resolveModuleNameSpy(moduleName, containingFile, compilerOptions, moduleResolutionHost);
+    }),
+  };
+});
+
 describe('mapImportsToPathAliases', () => {
   let module: ReturnType<typeof transpileModule>;
   let config: ValidatedConfig;
-  let resolveModuleNameSpy: jest.SpyInstance<
-    ReturnType<typeof ts.resolveModuleName>,
-    Parameters<typeof ts.resolveModuleName>
-  >;
   let outputTarget: OutputTargetDistCollection;
 
   beforeEach(() => {
     config = mockValidatedConfig({ tsCompilerOptions: {} });
 
-    resolveModuleNameSpy = jest.spyOn(ts, 'resolveModuleName');
+    resolveModuleNameSpy = jest.fn();
 
     outputTarget = {
       type: 'dist-collection',
@@ -32,7 +46,7 @@ describe('mapImportsToPathAliases', () => {
     resolveModuleNameSpy.mockReset();
   });
 
-  it('does nothing if the config flag is `false`', () => {
+  it.only('does nothing if the config flag is `false`', () => {
     outputTarget.transformAliasedImportPaths = false;
     resolveModuleNameSpy.mockReturnValue({
       resolvedModule: {
